@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,11 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public List<Item> getAll(long userId) {
         return items.values().stream().filter(item -> item.getOwner().getId() == userId).toList();
+    }
+
+    @Override
+    public List<Item> getAllItems() {
+        return new ArrayList<>(items.values());
     }
 
     @Override

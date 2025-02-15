@@ -12,6 +12,8 @@ public interface ItemStorage {
 
     List<Item> getAll(long userId);
 
+    List<Item> getAllItems();
+
     ItemDto addItem(ItemDto itemDto, User owner);
 
     ItemDto updateItem(Item item, Long itemId);

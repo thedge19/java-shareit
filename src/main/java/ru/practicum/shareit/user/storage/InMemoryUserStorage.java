@@ -7,10 +7,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Primary
 @Component
@@ -23,6 +20,11 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User get(long id) {
         return users.get(id);
+    }
+
+    @Override
+    public Collection<User> getAllUsers() {
+        return users.values();
     }
 
     @Override
