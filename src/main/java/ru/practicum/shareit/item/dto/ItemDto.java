@@ -1,9 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import ru.practicum.shareit.exception.Marker;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 /**
  * TODO Sprint add-controllers.

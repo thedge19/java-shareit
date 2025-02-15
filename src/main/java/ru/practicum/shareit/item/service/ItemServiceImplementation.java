@@ -23,7 +23,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ItemServiceImplementation implements ItemService {
 
-    private static final Logger log = LoggerFactory.getLogger(ItemServiceImplementation.class);
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
 
