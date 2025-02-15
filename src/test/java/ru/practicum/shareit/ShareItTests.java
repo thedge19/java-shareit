@@ -33,8 +33,6 @@ class ShareItTests {
 	private ItemDto itemDto1;
 	private ItemDto itemDto2;
 	private ItemDto itemDto3;
-    @Autowired
-    private InMemoryItemStorage inMemoryItemStorage;
 
 	@BeforeEach
 	void contextLoads() {
