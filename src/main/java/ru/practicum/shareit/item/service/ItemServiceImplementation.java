@@ -2,8 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
