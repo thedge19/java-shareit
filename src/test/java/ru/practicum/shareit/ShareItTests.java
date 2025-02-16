@@ -128,7 +128,7 @@ class ShareItTests {
 		user.setId(null);
 		user.setName("John");
 		user.setEmail("john@mail.ru");
-		return UserMapper.toUserDto(user);
+		return UserMapper.INSTANCE.userToUserDto(user);
 	}
 
 	private UserDto makeAnotherUser() {

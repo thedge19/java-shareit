@@ -16,7 +16,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleMethodNotFoundException(final NotFoundException e) {
-        log.info("404 {}", e.getMessage());
         return Map.of(
                 "error", "Ошибка с параметром count.",
                 "errorMessage", e.getMessage()
@@ -26,7 +25,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleMethodInternalExceptionException(final InternalErrorException e) {
-        log.warn("500 {}", e.getMessage());
+        //        log.warn("500 {}", e.getMessage());
         return Map.of(
                 "error", "Ошибка с параметром count.",
                 "errorMessage", e.getMessage()
@@ -36,7 +35,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodBadRequestException(final ValidationException e) {
-        log.info("400 {}", e.getMessage());
         return Map.of(
                 "error", "Ошибка с параметром count.",
                 "errorMessage", e.getMessage()

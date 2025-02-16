@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.InternalErrorException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -44,7 +43,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public UserDto update(UserDto userDto, long id) {
+    public User update(UserDto userDto, long id) {
         User user = users.get(id);
         String oldEmail = userDto.getEmail();
 
@@ -59,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
         emails.add(userDto.getEmail());
         users.put(id, user);
 
-        return UserMapper.toUserDto(user);
+        return user;
     }
 
     @Override
