@@ -21,7 +21,7 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
-    private final static String USER_ID = "X-Sharer-User-Id";
+    private final String USER_ID = "X-Sharer-User-Id";
 
     @GetMapping("/{id}")
     public ItemDto get(
