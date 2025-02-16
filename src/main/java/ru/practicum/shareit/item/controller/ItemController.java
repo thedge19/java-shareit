@@ -21,7 +21,7 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
-    private final String USER_ID = "X-Sharer-User-Id";
+    final static String USERID = "X-Sharer-User-Id";
 
     @GetMapping("/{id}")
     public ItemDto get(
@@ -33,7 +33,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getAll(
-            @RequestHeader(USER_ID) long userId
+            @RequestHeader(USERID) long userId
     ) {
         return itemService.getAll(userId);
     }
@@ -41,7 +41,7 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(
             @Validated(Marker.OnCreate.class)
-            @RequestHeader(USER_ID) long userId,
+            @RequestHeader(USERID) long userId,
             @RequestBody ItemDto itemDto) {
 
         log.info("Создаётся новая вещь: {} пользователем id={}", itemDto, userId);
@@ -55,7 +55,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(
             @PathVariable long itemId,
-            @RequestHeader(USER_ID) long userId,
+            @RequestHeader(USERID) long userId,
             @RequestBody ItemDto itemDto) {
         log.info("Обновляется вещь id={}, {}, пользователем id={}", itemId, itemDto, userId);
         ItemDto updatedItem = itemService.updateItem(itemDto, itemId, userId);
