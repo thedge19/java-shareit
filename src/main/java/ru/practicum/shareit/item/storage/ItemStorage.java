@@ -14,9 +14,9 @@ public interface ItemStorage {
 
     List<Item> getAllItems();
 
-    ItemDto addItem(ItemDto itemDto, User owner);
+    Item addItem(ItemDto itemDto, User owner);
 
-    ItemDto updateItem(Item item, Long itemId);
+    Item updateItem(Item item, Long itemId);
 
     List<Item> search(String searchText);
 

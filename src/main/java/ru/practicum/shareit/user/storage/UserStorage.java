@@ -4,7 +4,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
-import java.util.Set;
 
 public interface UserStorage {
 
@@ -12,11 +11,9 @@ public interface UserStorage {
 
     Collection<User> getAllUsers();
 
-    UserDto create(UserDto userDto);
+    User create(UserDto userDto);
 
     UserDto update(UserDto userDto, long id);
-
-    Set<String> getEmails();
 
     void delete(long id);
 }

@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -16,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@Primary
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImplementation implements ItemService {
@@ -59,7 +57,7 @@ public class ItemServiceImplementation implements ItemService {
             throw new ValidationException("Available not found");
         }
 
-        return itemStorage.addItem(itemDto, owner);
+        return ItemMapper.toItemDto(itemStorage.addItem(itemDto, owner));
     }
 
     @Override
@@ -82,13 +80,13 @@ public class ItemServiceImplementation implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
 
-        return itemStorage.updateItem(item, itemId);
+        return ItemMapper.toItemDto(itemStorage.updateItem(item, itemId));
     }
 
     @Override
     public List<ItemDto> search(String searchText) {
         if (searchText.isBlank()) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         searchText = searchText.toLowerCase();

@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.exception.InternalErrorException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -28,14 +29,33 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public UserDto create(UserDto userDto) {
+    public User create(UserDto userDto) {
         User user = new User();
 
         long id = getNextId(users);
 
         user.setId(id);
         user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
+        addEmail(user, userDto.getEmail());
+        emails.add(userDto.getEmail());
+        users.put(id, user);
+
+        return user;
+    }
+
+    @Override
+    public UserDto update(UserDto userDto, long id) {
+        User user = users.get(id);
+        String oldEmail = userDto.getEmail();
+
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null) {
+            addEmail(user, userDto.getEmail());
+        }
+
+        emails.remove(oldEmail);
         emails.add(userDto.getEmail());
         users.put(id, user);
 
@@ -43,27 +63,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public UserDto update(UserDto userDto, long id) {
-        User user = users.get(id);
-        if (userDto.getName() != null) {
-            user.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null) {
-            user.setEmail(userDto.getEmail());
-        }
-
-        users.put(id, user);
-
-        return UserMapper.toUserDto(user);
-    }
-
-    @Override
-    public Set<String> getEmails() {
-        return emails;
-    }
-
-    @Override
     public void delete(long id) {
+        emails.remove(users.get(id).getEmail());
         users.remove(id);
     }
 
@@ -74,5 +75,12 @@ public class InMemoryUserStorage implements UserStorage {
                 .max()
                 .orElse(0);
         return ++currentMaxId;
+    }
+
+    private void addEmail(User user, String email) {
+        if (emails.contains(email) && !Objects.equals(user.getEmail(), email)) {
+            throw new InternalErrorException("Некорректный email");
+        }
+        user.setEmail(email);
     }
 }

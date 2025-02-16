@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Primary
 @Component
 @RequiredArgsConstructor
 public class InMemoryItemStorage implements ItemStorage {
@@ -36,7 +35,7 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public ItemDto addItem(ItemDto itemDto, User owner) {
+    public Item addItem(ItemDto itemDto, User owner) {
         Item item = new Item();
         long id = getNextId(items);
         item.setId(id);
@@ -47,13 +46,13 @@ public class InMemoryItemStorage implements ItemStorage {
 
         items.put(id, item);
 
-        return ItemMapper.toItemDto(item);
+        return item;
     }
 
     @Override
-    public ItemDto updateItem(Item item, Long itemId) {
+    public Item updateItem(Item item, Long itemId) {
         items.put(itemId, item);
-        return ItemMapper.toItemDto(item);
+        return item;
     }
 
     @Override

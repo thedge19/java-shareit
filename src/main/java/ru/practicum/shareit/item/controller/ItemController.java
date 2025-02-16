@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.controller;
 
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
+    private final static String USER_ID = "X-Sharer-User-Id";
 
     @GetMapping("/{id}")
     public ItemDto get(
@@ -31,7 +33,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getAll(
-            @RequestHeader("X-Sharer-User-Id") long userId
+            @RequestHeader(USER_ID) long userId
     ) {
         return itemService.getAll(userId);
     }
@@ -39,7 +41,7 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(
             @Validated(Marker.OnCreate.class)
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(USER_ID) long userId,
             @RequestBody ItemDto itemDto) {
 
         log.info("Создаётся новая вещь: {} пользователем id={}", itemDto, userId);
@@ -53,7 +55,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(
             @PathVariable long itemId,
-            @RequestHeader("X-Sharer-User-Id") long userId,
+            @RequestHeader(USER_ID) long userId,
             @RequestBody ItemDto itemDto) {
         log.info("Обновляется вещь id={}, {}, пользователем id={}", itemId, itemDto, userId);
         ItemDto updatedItem = itemService.updateItem(itemDto, itemId, userId);
@@ -63,8 +65,7 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(
-            @RequestParam(name = "text") String searchText) {
-
+            @RequestParam(name = "text") @Size(max = 15) String searchText) {
         log.info("Поиск вещей с текстом {}", searchText);
         List<ItemDto> items = itemService.search(searchText);
         log.info("Список найденных вещей длиной: {}", items.size());
