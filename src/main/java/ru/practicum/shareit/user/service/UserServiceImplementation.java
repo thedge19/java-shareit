@@ -25,7 +25,6 @@ public class UserServiceImplementation implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         List<UserDto> userDtos = userStorage.getAllUsers().stream().map(UserMapper::toUserDto).toList();
-        
         for (UserDto filteredUserDto : userDtos) {
             if (Objects.equals(userDto, filteredUserDto)) {
                 throw new InternalErrorException("Данный пользователь уже зарегистрирован");
