@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,11 +11,17 @@ import java.util.Objects;
 /**
  * TODO Sprint add-controllers.
  */
+@Entity
+@Table(name = "users")
 @NoArgsConstructor
 @Data
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
     @NotEmpty(groups = Marker.OnCreate.class)
+    @Column(name = "user_name")
     private String name;
     @NotEmpty(groups = Marker.OnCreate.class)
     private String email;

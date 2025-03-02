@@ -1,9 +1,12 @@
 package ru.practicum.shareit.item.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.exception.Marker;
+
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -13,13 +16,27 @@ import ru.practicum.shareit.exception.Marker;
 @Data
 public class ItemDto {
     private Long id;
-    @NotEmpty(groups = Marker.OnCreate.class)
+
+    @NotBlank(groups = Marker.OnCreate.class)
     private String name;
-    @NotEmpty(groups = Marker.OnCreate.class)
+
+    @NotBlank(groups = Marker.OnCreate.class)
     private String description;
 
-    @NotEmpty(groups = Marker.OnCreate.class)
+    @NotNull(groups = Marker.OnCreate.class)
     private Boolean available;
 
     private Integer requestId;
+
+    private ItemBooking nextBooking;
+    private ItemBooking lastBooking;
+
+    private List<CommentDto> comments;
+
+    @Data
+    @Builder
+    public static class ItemBooking {
+        private long id;
+        private long bookerId;
+    }
 }
