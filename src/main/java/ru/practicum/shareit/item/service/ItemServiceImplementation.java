@@ -1,11 +1,11 @@
 package ru.practicum.shareit.item.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.booking.storage.BookingStorage;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -14,8 +14,8 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.CommentStorage;
-import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -26,13 +26,14 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ItemServiceImplementation implements ItemService {
 
-    private final ItemStorage itemStorage;
+    private final ItemRepository itemRepository;
     private final UserService userService;
-    private final CommentStorage commentStorage;
-    private final BookingStorage bookingStorage;
+    private final CommentRepository commentRepository;
+    private final BookingRepository bookingRepository;
 
     @Transactional
     @Override
@@ -51,7 +52,7 @@ public class ItemServiceImplementation implements ItemService {
     @Transactional
     @Override
     public List<ItemDto> getAll(long userId) {
-        List<Item> items = itemStorage.findAllByOwnerId(userId);
+        List<Item> items = itemRepository.findAllByOwnerId(userId);
         return items.stream().map(ItemMapper.INSTANCE::itemToItemDto).toList();
     }
 
@@ -63,7 +64,7 @@ public class ItemServiceImplementation implements ItemService {
         Item item = ItemMapper.INSTANCE.itemDtoToItem(itemDto);
         item.setOwner(owner);
 
-        return ItemMapper.INSTANCE.itemToItemDto(itemStorage.save(item));
+        return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(item));
     }
 
     @Transactional
@@ -87,7 +88,7 @@ public class ItemServiceImplementation implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
 
-        return ItemMapper.INSTANCE.itemToItemDto(itemStorage.save(item));
+        return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(item));
     }
 
     @Transactional
@@ -99,7 +100,7 @@ public class ItemServiceImplementation implements ItemService {
 
         searchText = searchText.toLowerCase();
 
-        return itemStorage.findBySearchText(searchText)
+        return itemRepository.findBySearchText(searchText)
                 .stream()
                 .filter(Item::getAvailable)
                 .map(ItemMapper.INSTANCE::itemToItemDto)
@@ -117,22 +118,20 @@ public class ItemServiceImplementation implements ItemService {
         comment.setAuthor(author);
         comment.setCreated(LocalDateTime.now());
 
-        if (bookingStorage.findAllApprovedByItemIdAndBookerId(itemId, userId, LocalDateTime.now()).isEmpty()) {
+        if (bookingRepository.findAllApprovedByItemIdAndBookerId(itemId, userId, LocalDateTime.now()).isEmpty()) {
             throw new BadRequestException("Комментарии можно оставлять только к тем вещам, на которые было бронирование");
         }
 
-        return CommentMapper.INSTANCE.commentToDto(commentStorage.save(comment));
+        return CommentMapper.INSTANCE.commentToDto(commentRepository.save(comment));
     }
-
-    @Transactional
 
     @Override
     public Item findItemOrNot(long id) {
-        return itemStorage.findById(id).orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+        return itemRepository.findById(id).orElseThrow(() -> new NotFoundException("Вещь не найдена"));
     }
 
     private void addBookingInfo(ItemDto itemDto) {
-        List<Booking> bookings = bookingStorage.findAllByItemId(itemDto.getId());
+        List<Booking> bookings = bookingRepository.findAllByItemId(itemDto.getId());
 
         Booking nextBooking = bookings.stream()
                 .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
@@ -156,7 +155,7 @@ public class ItemServiceImplementation implements ItemService {
     }
 
     private void addComments(ItemDto itemDto) {
-        itemDto.setComments(commentStorage.findAllByItemId(itemDto.getId())
+        itemDto.setComments(commentRepository.findAllByItemId(itemDto.getId())
                 .stream()
                 .map(CommentMapper.INSTANCE::commentToDto)
                 .toList());

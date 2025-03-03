@@ -52,7 +52,7 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingResponseDto> getAll(
-            @RequestParam(required = false, defaultValue = "ALL") RequestStatus state,
+            @RequestParam(defaultValue = "ALL") RequestStatus state,
             @RequestHeader(BOOKER_ID) long bookerId
             ) {
         log.info("Запрашиваются бронирования пользователя с id={} и state={}", bookerId, state);

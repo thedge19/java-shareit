@@ -1,35 +1,36 @@
 package ru.practicum.shareit.user.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.InternalErrorException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.Objects;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class UserServiceImplementation implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     @Transactional
     @Override
     public UserDto createUser(UserDto userDto) {
-        List<UserDto> userDtos = userStorage.findAll().stream().map(UserMapper.INSTANCE::userToUserDto).toList();
+        List<UserDto> userDtos = userRepository.findAll().stream().map(UserMapper.INSTANCE::userToUserDto).toList();
         for (UserDto filteredUserDto : userDtos) {
             if (Objects.equals(userDto, filteredUserDto)) {
                 throw new InternalErrorException("Данный пользователь уже зарегистрирован");
             }
         }
 
-        return UserMapper.INSTANCE.userToUserDto(userStorage.save(UserMapper.INSTANCE.userDtoToUser(userDto)));
+        return UserMapper.INSTANCE.userToUserDto(userRepository.save(UserMapper.INSTANCE.userDtoToUser(userDto)));
     }
 
     @Transactional
@@ -55,12 +56,12 @@ public class UserServiceImplementation implements UserService {
     @Transactional
     @Override
     public void deleteUser(long id) {
-        userStorage.findById(id);
-        userStorage.deleteById(id);
+        userRepository.findById(id);
+        userRepository.deleteById(id);
     }
 
     @Override
     public User findUserOrNot(long id) {
-        return userStorage.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 }

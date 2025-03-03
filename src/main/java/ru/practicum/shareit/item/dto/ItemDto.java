@@ -26,7 +26,7 @@ public class ItemDto {
     @NotNull(groups = Marker.OnCreate.class)
     private Boolean available;
 
-    private Integer requestId;
+    private Long requestId;
 
     private ItemBooking nextBooking;
     private ItemBooking lastBooking;

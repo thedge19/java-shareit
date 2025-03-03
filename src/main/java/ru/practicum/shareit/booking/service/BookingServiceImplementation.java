@@ -1,15 +1,16 @@
 package ru.practicum.shareit.booking.service;
 
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.dto.RequestStatus;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.booking.storage.BookingStorage;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -21,11 +22,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImplementation implements BookingService {
 
     private final UserService userService;
     private final ItemService itemService;
-    private final BookingStorage bookingStorage;
+    private final BookingRepository bookingRepository;
 
     @Override
     @Transactional
@@ -46,7 +48,7 @@ public class BookingServiceImplementation implements BookingService {
         booking.setItem(bookingItem);
         booking.setStatus(BookingStatus.WAITING);
 
-        return BookingMapper.INSTANCE.bookingToBookingResponseDto(bookingStorage.save(booking));
+        return BookingMapper.INSTANCE.bookingToBookingResponseDto(bookingRepository.save(booking));
     }
 
     @Override
@@ -64,7 +66,7 @@ public class BookingServiceImplementation implements BookingService {
 
         updatedBooking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 
-        return BookingMapper.INSTANCE.bookingToBookingResponseDto(bookingStorage.save(updatedBooking));
+        return BookingMapper.INSTANCE.bookingToBookingResponseDto(updatedBooking);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class BookingServiceImplementation implements BookingService {
     public List<BookingResponseDto> getAll(long bookerId, RequestStatus state) {
         userService.findUserOrNot(bookerId);
 
-        return bookingStorage
+        return bookingRepository
                 .findAllByBookerIdOrderByStartDesc(bookerId)
                 .stream()
                 .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
@@ -97,7 +99,7 @@ public class BookingServiceImplementation implements BookingService {
     public List<BookingResponseDto> getAllOwnersItems(RequestStatus requestStatus, long ownerId) {
         userService.findUserOrNot(ownerId);
 
-        return bookingStorage.findAllByItemOwnerIdOrderByStartDesc(ownerId)
+        return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId)
                 .stream()
                 .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
                 .toList();
@@ -105,6 +107,6 @@ public class BookingServiceImplementation implements BookingService {
 
     @Override
     public Booking getBookingOrNot(long id) {
-        return bookingStorage.findById(id).orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
+        return bookingRepository.findById(id).orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
     }
 }
