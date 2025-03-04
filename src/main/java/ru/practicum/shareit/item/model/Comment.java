@@ -1,32 +1,37 @@
-package ru.practicum.shareit.user.model;
+package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
-import ru.practicum.shareit.exception.Marker;
+import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * TODO Sprint add-controllers.
- */
+@Table(name = "comments")
 @Entity
-@Table(name = "users")
-@NoArgsConstructor
 @Getter
 @Setter
 @ToString
-public class User {
+@RequiredArgsConstructor
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "comment_id")
     private Long id;
-    @NotEmpty(groups = Marker.OnCreate.class)
-    @Column(name = "user_name")
-    private String name;
-    @NotEmpty(groups = Marker.OnCreate.class)
-    private String email;
+
+    private String text;
+
+    @JoinColumn(name = "item_id")
+    @ManyToOne
+    private Item item;
+
+    @JoinColumn(name = "author_id")
+    @ManyToOne
+    private User author;
+
+    @Column(name = "created_date")
+    private LocalDateTime created;
 
     @Override
     public final boolean equals(Object o) {
@@ -35,8 +40,8 @@ public class User {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        User user = (User) o;
-        return getId() != null && Objects.equals(getId(), user.getId());
+        Comment comment = (Comment) o;
+        return getId() != null && Objects.equals(getId(), comment.getId());
     }
 
     @Override
