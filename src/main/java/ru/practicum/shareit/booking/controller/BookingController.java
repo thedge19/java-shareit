@@ -60,7 +60,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingResponseDto> getAllUserBookings(@RequestParam(required = false, defaultValue = "ALL") RequestStatus state,
+    public List<BookingResponseDto> getAllUserBookings(@RequestParam(defaultValue = "ALL") RequestStatus state,
                                                        @RequestHeader(BOOKER_ID) int ownerId) {
         log.info("Запрашиваются бронирования всех вещей пользователя с id={}", ownerId);
         return bookingService.getAllOwnersItems(state, ownerId);

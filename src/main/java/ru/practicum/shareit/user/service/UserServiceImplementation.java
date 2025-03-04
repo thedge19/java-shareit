@@ -33,7 +33,6 @@ public class UserServiceImplementation implements UserService {
         return UserMapper.INSTANCE.userToUserDto(userRepository.save(UserMapper.INSTANCE.userDtoToUser(userDto)));
     }
 
-    @Transactional
     @Override
     public UserDto getUser(long id) {
         return UserMapper.INSTANCE.userToUserDto(findUserOrNot(id));

@@ -83,7 +83,6 @@ public class BookingServiceImplementation implements BookingService {
     }
 
     @Override
-    @Transactional
     public List<BookingResponseDto> getAll(long bookerId, RequestStatus state) {
         userService.findUserOrNot(bookerId);
 
@@ -95,7 +94,6 @@ public class BookingServiceImplementation implements BookingService {
     }
 
     @Override
-    @Transactional
     public List<BookingResponseDto> getAllOwnersItems(RequestStatus requestStatus, long ownerId) {
         userService.findUserOrNot(ownerId);
 

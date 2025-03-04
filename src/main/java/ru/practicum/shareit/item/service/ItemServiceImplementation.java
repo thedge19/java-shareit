@@ -35,7 +35,6 @@ public class ItemServiceImplementation implements ItemService {
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
 
-    @Transactional
     @Override
     public ItemDto get(long id, long userId) {
         Item item = findItemOrNot(id);
@@ -49,7 +48,6 @@ public class ItemServiceImplementation implements ItemService {
         return itemDto;
     }
 
-    @Transactional
     @Override
     public List<ItemDto> getAll(long userId) {
         List<Item> items = itemRepository.findAllByOwnerId(userId);
@@ -91,7 +89,6 @@ public class ItemServiceImplementation implements ItemService {
         return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(item));
     }
 
-    @Transactional
     @Override
     public List<ItemDto> search(String searchText) {
         if (searchText.isBlank()) {
