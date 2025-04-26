@@ -49,6 +49,11 @@ public class ItemServiceImplementation implements ItemService {
         }
         addComments(itemDto);
 
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestService.getItemRequestOrNot(itemDto.getRequestId());
+            item.setItemRequest(itemRequest);
+        }
+
         return itemDto;
     }
 

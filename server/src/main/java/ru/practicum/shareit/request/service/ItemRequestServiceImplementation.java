@@ -40,6 +40,7 @@ public class ItemRequestServiceImplementation implements ItemRequestService {
     @Override
     public ItemRequestDto create(ItemRequestCreateDto itemRequestCreateDto, long requestorId) {
         User user = userRepository.findById(requestorId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        log.info("Creating new item request");
         ItemRequest itemRequest = ItemRequestMapper.INSTANCE.toItemRequest(itemRequestCreateDto, user);
         itemRequest.setCreated(LocalDateTime.now());
         itemRequest.setRequestor(user);

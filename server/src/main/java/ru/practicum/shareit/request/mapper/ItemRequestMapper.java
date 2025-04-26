@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request.mapper;
 
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -12,7 +13,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Mapper
 public interface ItemRequestMapper {
     ItemRequestMapper INSTANCE = Mappers.getMapper(ItemRequestMapper.class);
 

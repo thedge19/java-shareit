@@ -22,7 +22,7 @@ public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
-    public ItemRequestDto addRequest(@RequestHeader(USERID_HEADER) Integer requesterId, @RequestBody ItemRequestCreateDto itemRequestCreateDto) {
+    public ItemRequestDto addRequest(@RequestHeader(USERID_HEADER) int requesterId, @RequestBody ItemRequestCreateDto itemRequestCreateDto) {
         log.info("Создаем запрос на вещь с описанием {}", itemRequestCreateDto.getDescription());
         return itemRequestService.create(itemRequestCreateDto, requesterId);
     }
@@ -35,12 +35,12 @@ public class ItemRequestController {
 
     @GetMapping
     public List<ItemRequestDto> getAllUserRequests(@RequestHeader(USERID_HEADER) long requesterId) {
-        log.info("Выводим все запросы от пользователя с ИД = {}", requesterId);
+        log.info("Выводим все запросы от пользователя с id={}", requesterId);
         return itemRequestService.getAllUserRequests(requesterId);
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestWithItemsDto getItemRequestById(@PathVariable Integer requestId) {
+    public ItemRequestWithItemsDto getItemRequestById(@PathVariable int requestId) {
         log.info("Ищем вещи по запросу с id={}", requestId);
         return itemRequestService.getByRequestId(requestId);
     }
