@@ -26,7 +26,7 @@
     </modules>
 
     <build>
-        <pluginManagement>
+<!--        <pluginManagement>-->
             <plugins>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
@@ -163,7 +163,7 @@
                     </executions>
                 </plugin>
             </plugins>
-        </pluginManagement>
+<!--        </pluginManagement>-->
     </build>
     <profiles>
         <profile>
