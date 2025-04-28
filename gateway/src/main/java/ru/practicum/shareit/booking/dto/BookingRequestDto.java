@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Builder
 public class BookingRequestDto {
     @NotNull(message = "Время старта не может быть пустым")
-//    @Future(message = "Время старта должно быть в будущем")
     private LocalDateTime start;
 
     @NotNull(message = "Время окончания не может быть пустым")
