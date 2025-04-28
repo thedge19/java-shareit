@@ -24,13 +24,18 @@ public class UserServiceImplementation implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         List<UserDto> userDtos = userRepository.findAll().stream().map(UserMapper.INSTANCE::userToUserDto).toList();
+
         for (UserDto filteredUserDto : userDtos) {
             if (Objects.equals(userDto, filteredUserDto)) {
                 throw new InternalErrorException("Данный пользователь уже зарегистрирован");
             }
         }
 
-        return UserMapper.INSTANCE.userToUserDto(userRepository.save(UserMapper.INSTANCE.userDtoToUser(userDto)));
+        User user = UserMapper.INSTANCE.userDtoToUser(userDto);
+
+        if (emailCheck(user)) throw new InternalErrorException("Данная почта уже используется");
+
+        return UserMapper.INSTANCE.userToUserDto(userRepository.save(user));
     }
 
     @Override
@@ -62,5 +67,10 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User findUserOrNot(long id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+    }
+
+    private boolean emailCheck(User user) {
+
+        return userRepository.findAll().stream().anyMatch(u -> user.getEmail().equals(u.getEmail()));
     }
 }
