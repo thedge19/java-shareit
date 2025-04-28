@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -26,6 +27,7 @@ public class User {
     @Column(name = "user_name")
     private String name;
     @NotEmpty(groups = Marker.OnCreate.class)
+    @Email(groups = Marker.OnCreate.class)
     private String email;
 
     @Override
