@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -27,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -48,6 +50,7 @@ public class ItemServiceImplementation implements ItemService {
             addBookingInfo(itemDto);
         }
         addComments(itemDto);
+        log.info("Comments {} added", itemDto.getComments().getFirst());
 
         if (itemDto.getRequestId() != null) {
             ItemRequest itemRequest = itemRequestService.getItemRequestOrNot(itemDto.getRequestId());
