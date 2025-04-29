@@ -74,7 +74,7 @@ public class UserServiceTest {
 
         List<UserDto> resultDtoList = userService.getAll();
 
-        assertThat(resultDtoList.get(0).getId(), equalTo(user1.getId()));
+        assertThat(resultDtoList.getFirst().getId(), equalTo(user1.getId()));
         assertThat(resultDtoList.get(0).getName(), equalTo(user1.getName()));
         assertThat(resultDtoList.get(0).getEmail(), equalTo(user1.getEmail()));
 

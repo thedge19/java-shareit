@@ -15,21 +15,16 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
