@@ -107,4 +107,6 @@ public class BookingServiceImplementation implements BookingService {
     public Booking getBookingOrNot(long id) {
         return bookingRepository.findById(id).orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
     }
+
+
 }

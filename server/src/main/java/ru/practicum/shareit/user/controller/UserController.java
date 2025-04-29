@@ -8,6 +8,8 @@ import ru.practicum.shareit.exception.Marker;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.List;
+
 /**
  * TODO Sprint add-controllers.
  */
@@ -23,6 +25,11 @@ public class UserController {
     public UserDto get(@PathVariable long id) {
         log.info("Запрашивается пользователь с Id={}", id);
         return userService.getUser(id);
+    }
+
+    @GetMapping
+    public List<UserDto> getAll() {
+        return userService.getAll();
     }
 
     @PostMapping
@@ -46,7 +53,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable long userId) {
+    public void deleteUser(@PathVariable long userId) {
         log.info("Deleting user: id={}", userId);
         userService.deleteUser(userId);
     }

@@ -12,12 +12,9 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class BookingRequestDto {
-    @NotNull
     private Long itemId;
 
-    @NotNull
     private LocalDateTime start;
 
-    @NotNull
     private LocalDateTime end;
 }

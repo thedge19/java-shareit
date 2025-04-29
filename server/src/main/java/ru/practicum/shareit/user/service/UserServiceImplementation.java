@@ -73,4 +73,12 @@ public class UserServiceImplementation implements UserService {
 
         return userRepository.findAll().stream().anyMatch(u -> user.getEmail().equals(u.getEmail()));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserDto> getAll() {
+        return userRepository.findAll().stream()
+                .map(UserMapper.INSTANCE::userToUserDto)
+                .toList();
+    }
 }

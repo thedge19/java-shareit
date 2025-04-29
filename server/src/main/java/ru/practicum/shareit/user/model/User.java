@@ -14,10 +14,10 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "users")
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

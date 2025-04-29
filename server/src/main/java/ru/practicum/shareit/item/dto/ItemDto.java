@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.exception.Marker;
 
 import java.util.List;
@@ -17,13 +18,10 @@ import java.util.List;
 public class ItemDto {
     private Long id;
 
-    @NotBlank(groups = Marker.OnCreate.class)
     private String name;
 
-    @NotBlank(groups = Marker.OnCreate.class)
     private String description;
 
-    @NotNull(groups = Marker.OnCreate.class)
     private Boolean available;
 
     private Integer requestId;
