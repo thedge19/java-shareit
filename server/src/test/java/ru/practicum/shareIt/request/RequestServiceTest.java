@@ -93,9 +93,9 @@ public class RequestServiceTest {
     @DisplayName("Получение запроса по несуществующему ID")
     void getRequestByInvalidId() {
         int invalidRequestId = 999;
-        assertThatThrownBy(() -> itemRequestService.getByRequestId(invalidRequestId))
+        assertThatThrownBy(() -> itemRequestService.getItemRequestOrNot(invalidRequestId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Запрос не найден");
+                .hasMessageContaining("ItemRequest not found");
     }
 
     @Test
