@@ -4,12 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
 import ru.practicum.shareit.exception.Marker;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
-
-import java.util.Objects;
 
 /**
  * TODO Sprint add-controllers.
