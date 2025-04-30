@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -86,6 +87,29 @@ public class UserServiceTest {
         assertThat(resultDtoList.get(1).getEmail(), equalTo(user2.getEmail()));
 
         verify(userRepository, times(1)).findAll();
+        verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test
+    void updateTest() {
+        UserDto inputDto = UserDto.builder().build();
+
+        User user = getUser(1);
+
+        System.out.println(user);
+        System.out.println(userRepository.findById(user.getId()));
+
+        when(userRepository.findById(eq(user.getId()))).thenReturn(Optional.ofNullable(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        UserDto resultDto = userService.updateUser(inputDto, user.getId());
+
+        assertThat(resultDto.getId(), equalTo(user.getId()));
+        assertThat(resultDto.getName(), equalTo(user.getName()));
+        assertThat(resultDto.getEmail(), equalTo(user.getEmail()));
+
+        verify(userRepository, times(1)).findById(eq(user.getId()));
+        verify(userRepository, times(1)).save(any(User.class));
         verifyNoMoreInteractions(userRepository);
     }
 
