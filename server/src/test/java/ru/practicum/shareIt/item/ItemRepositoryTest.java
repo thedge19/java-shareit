@@ -4,13 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+@ContextConfiguration(classes = ShareItServer.class)
 @DataJpaTest
 @Transactional
 public class ItemRepositoryTest {
