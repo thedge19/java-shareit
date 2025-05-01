@@ -20,5 +20,5 @@ public interface BookingService {
 
     List<BookingResponseDto> getAllOwnersItems(RequestStatus requestBookingStatus, long ownerId);
 
-    List<BookingResponseDto> getAllByStateForOwner(RequestStatus requestBookingStatus, long userId, int from, int size);
+    List<BookingResponseDto> getAllByState(RequestStatus requestBookingStatus, long userId, int from, int size);
 }
