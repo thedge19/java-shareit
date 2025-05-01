@@ -2,8 +2,10 @@ package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.dto.RequestStatus;
@@ -11,14 +13,15 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class BookingServiceImplementation implements BookingService {
     private final UserService userService;
     private final ItemService itemService;
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -36,11 +40,11 @@ public class BookingServiceImplementation implements BookingService {
         Item bookingItem = itemService.findItemOrNot(requestDto.getItemId());
 
         if (!bookingItem.getAvailable()) {
-            throw new BadRequestException("Вещь недоступна для бронирования");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вещь недоступна для бронирования");
         }
 
         if (bookingItem.getOwner().getId() == bookerId) {
-            throw new NotFoundException("Владелец не может бронировать свою вестчь");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Владелец не может бронировать свою вестчь");
         }
 
         Booking booking = BookingMapper.INSTANCE.bookingRequestDtoToBooking(requestDto);
@@ -57,11 +61,11 @@ public class BookingServiceImplementation implements BookingService {
         Booking updatedBooking = getBookingOrNot(bookingId);
 
         if (updatedBooking.getItem().getOwner().getId() != userId) {
-            throw new BadRequestException("Подтверждение доступно только для владельца вещи");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Подтверждение доступно только для владельца вещи");
         }
 
         if (updatedBooking.getStatus() != BookingStatus.WAITING) {
-            throw new NotFoundException("Вещь не ожидает подтверждения");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вещь не ожидает подтверждения");
         }
 
         updatedBooking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
@@ -76,7 +80,7 @@ public class BookingServiceImplementation implements BookingService {
         userService.findUserOrNot(bookerId);
 
         if (!(booking.getBooker().getId() == bookerId || booking.getItem().getOwner().getId() == bookerId)) {
-            throw new NotFoundException("Не найдено подходящих бронирований для пользователя " + bookerId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не найдено подходящих бронирований для пользователя " + bookerId);
         }
 
         return BookingMapper.INSTANCE.bookingToBookingResponseDto(booking);
@@ -105,8 +109,40 @@ public class BookingServiceImplementation implements BookingService {
 
     @Override
     public Booking getBookingOrNot(long id) {
-        return bookingRepository.findById(id).orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
+        return bookingRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookingResponseDto> getAllByStateForOwner(RequestStatus requestBookingStatus, long userId, int from, int size) {
 
+        switch (requestBookingStatus) {
+            case ALL:
+                return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId).stream()
+                        .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                        .collect(Collectors.toList());
+            case PAST:
+                return bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now()).stream()
+                        .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                        .collect(Collectors.toList());
+            case FUTURE:
+                return bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now()).stream()
+                        .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                        .collect(Collectors.toList());
+            case CURRENT:
+                return bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now()).stream()
+                        .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                        .collect(Collectors.toList());
+            case WAITING:
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING).stream()
+                        .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                        .collect(Collectors.toList());
+            case REJECTED:
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED).stream()
+                        .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                        .collect(Collectors.toList());
+            default:
+                throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "Неизвестный статус бронирования");
+        }
+    }
 }

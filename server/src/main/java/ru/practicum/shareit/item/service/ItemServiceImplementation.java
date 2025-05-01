@@ -2,13 +2,13 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
@@ -88,7 +88,7 @@ public class ItemServiceImplementation implements ItemService {
         Item item = findItemOrNot(itemId);
 
         if (!Objects.equals(item.getOwner().getId(), userId)) {
-            throw new NotFoundException("You are not allowed to update this item");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not allowed to update this item");
         }
 
         if (itemDto.getName() != null && !itemDto.getName().isEmpty()) {
@@ -133,7 +133,7 @@ public class ItemServiceImplementation implements ItemService {
         comment.setCreated(LocalDateTime.now());
 
         if (bookingRepository.findAllApprovedByItemIdAndBookerId(itemId, userId, LocalDateTime.now()).isEmpty()) {
-            throw new BadRequestException("Комментарии можно оставлять только к тем вещам, на которые было бронирование");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Комментарии можно оставлять только к тем вещам, на которые было бронирование");
         }
 
         return CommentMapper.INSTANCE.commentToDto(commentRepository.save(comment));
@@ -141,7 +141,7 @@ public class ItemServiceImplementation implements ItemService {
 
     @Override
     public Item findItemOrNot(long id) {
-        return itemRepository.findById(id).orElseThrow(() -> new NotFoundException("Вещь не найдена"));
+        return itemRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Вещь не найдена"));
     }
 
     private void addBookingInfo(ItemDto itemDto) {

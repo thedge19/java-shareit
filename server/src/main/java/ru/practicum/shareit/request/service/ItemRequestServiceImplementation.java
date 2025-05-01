@@ -2,9 +2,10 @@ package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.NotFoundException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -33,13 +34,13 @@ public class ItemRequestServiceImplementation implements ItemRequestService {
 
     @Override
     public ItemRequest getItemRequestOrNot(int id) {
-        return itemRequestRepository.findById(id).orElseThrow(() -> new NotFoundException("ItemRequest not found"));
+        return itemRequestRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Запрос не найден"));
     }
 
     @Transactional
     @Override
     public ItemRequestDto create(ItemRequestCreateDto itemRequestCreateDto, long requestorId) {
-        User user = userRepository.findById(requestorId).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User user = userRepository.findById(requestorId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
         log.info("Creating new item request");
         ItemRequest itemRequest = ItemRequestMapper.INSTANCE.toItemRequest(itemRequestCreateDto, user);
         itemRequest.setCreated(LocalDateTime.now());
@@ -60,7 +61,7 @@ public class ItemRequestServiceImplementation implements ItemRequestService {
     @Override
     public ItemRequestWithItemsDto getByRequestId(Integer requestId) {
         log.info("getByRequestId: {}", requestId);
-        ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(() -> new NotFoundException("Запрос не найден"));
+        ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Запрос не найден"));
         List<Item> itemsForRequest = itemRepository.findByRequestIdIn(List.of(requestId));
 
 

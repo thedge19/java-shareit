@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.ShareItServer;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestWithItemsDto;
@@ -94,8 +94,8 @@ public class RequestServiceTest {
     void getRequestByInvalidId() {
         int invalidRequestId = 999;
         assertThatThrownBy(() -> itemRequestService.getItemRequestOrNot(invalidRequestId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("ItemRequest not found");
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Запрос не найден");
     }
 
     @Test
