@@ -51,7 +51,7 @@ public class UserServiceTest {
     void getByIdTest() {
         User user = getUser(1);
 
-        when(userRepository.findById(user.getId())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         UserDto resultDto = userService.getUser(user.getId());
 
@@ -95,7 +95,7 @@ public class UserServiceTest {
 
         User user = getUser(1);
 
-        when(userRepository.findById(eq(user.getId()))).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findById(eq(user.getId()))).thenReturn(Optional.of(user));
 
         UserDto resultDto = userService.updateUser(inputDto, user.getId());
 
