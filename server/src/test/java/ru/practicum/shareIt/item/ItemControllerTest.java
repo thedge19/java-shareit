@@ -125,6 +125,7 @@ public class ItemControllerTest {
         verify(itemService, times(1)).updateItem(any(ItemDto.class), eq(itemId), eq(userId));
         verifyNoMoreInteractions(itemService);
     }
+
     @Test
     void getAll() throws Exception {
         long userId = 1;
