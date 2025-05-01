@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,19 +24,12 @@ public class UserServiceImplementation implements UserService {
     @Transactional
     @Override
     public UserDto createUser(UserDto userDto) {
-        List<UserDto> userDtos = userRepository.findAll().stream().map(UserMapper.INSTANCE::userToUserDto).toList();
-
-        for (UserDto filteredUserDto : userDtos) {
-            if (Objects.equals(userDto, filteredUserDto)) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Данный пользователь уже зарегистрирован");
-            }
-        }
-
         User user = UserMapper.INSTANCE.userDtoToUser(userDto);
-
-        if (emailCheck(user)) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Данная почта уже используется");
-
-        return UserMapper.INSTANCE.userToUserDto(userRepository.save(user));
+        try {
+            return UserMapper.INSTANCE.userToUserDto(userRepository.save(user));
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
     }
 
     @Override

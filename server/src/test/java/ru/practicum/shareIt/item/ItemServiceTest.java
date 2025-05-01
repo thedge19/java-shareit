@@ -221,6 +221,36 @@ public class ItemServiceTest {
     }
 
     @Test
+    void getAllBySearchTextTest() {
+        Item item1 = getItem(1);
+        Item item2 = getItem(2);
+
+        List<Item> itemList = Arrays.asList(
+                item1,
+                item2
+        );
+
+        when(itemRepository.findBySearchText(eq("Item"))).thenReturn(itemList);
+
+        List<ItemDto> resultDtoList = itemService.search("Item");
+
+        assertThat(resultDtoList.size(), equalTo(2));
+
+        assertThat(resultDtoList.getFirst().getId(), equalTo(item1.getId()));
+        assertThat(resultDtoList.getFirst().getName(), equalTo(item1.getName()));
+        assertThat(resultDtoList.get(0).getDescription(), equalTo(item1.getDescription()));
+        assertThat(resultDtoList.get(0).getAvailable(), equalTo(item1.getAvailable()));
+
+        assertThat(resultDtoList.get(1).getId(), equalTo(item2.getId()));
+        assertThat(resultDtoList.get(1).getName(), equalTo(item2.getName()));
+        assertThat(resultDtoList.get(1).getDescription(), equalTo(item2.getDescription()));
+        assertThat(resultDtoList.get(1).getAvailable(), equalTo(item2.getAvailable()));
+
+        verify(itemRepository, times(1)).findBySearchText(eq("Item"));
+        verifyNoMoreInteractions(itemRepository);
+    }
+
+    @Test
     void getAllBySearchTextTest_BlankQuery() {
         List<ItemDto> resultDtoList = itemService.search(" ");
 

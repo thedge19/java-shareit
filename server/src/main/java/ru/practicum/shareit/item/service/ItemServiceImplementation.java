@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -50,7 +49,6 @@ public class ItemServiceImplementation implements ItemService {
             addBookingInfo(itemDto);
         }
         addComments(itemDto);
-        log.info("Comments {} added", itemDto.getComments().getFirst());
 
         if (itemDto.getRequestId() != null) {
             ItemRequest itemRequest = itemRequestService.getItemRequestOrNot(itemDto.getRequestId());
@@ -111,8 +109,6 @@ public class ItemServiceImplementation implements ItemService {
         if (searchText.isBlank()) {
             return Collections.emptyList();
         }
-
-        searchText = searchText.toLowerCase();
 
         return itemRepository.findBySearchText(searchText)
                 .stream()
