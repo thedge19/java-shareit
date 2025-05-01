@@ -1,10 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-import ru.practicum.shareit.exception.Marker;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
