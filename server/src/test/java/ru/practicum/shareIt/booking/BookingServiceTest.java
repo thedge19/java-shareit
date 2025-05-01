@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.dto.RequestStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -19,6 +20,9 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -60,6 +64,7 @@ public class BookingServiceTest {
         Booking booking = getBooking(100, booker, item);
 
 
+
         when(bookingRepository.findById(eq(booking.getId()))).thenReturn(Optional.of(booking));
 
         BookingResponseDto responseDto = bookingService.get(booking.getId(), owner.getId());
@@ -96,108 +101,86 @@ public class BookingServiceTest {
         verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
     }
 
-//    @Test
-//    void getAllByStateTest() {
-//        User owner = getUser(1);
-//        User booker = getUser(2);
-//
-//        Item item1 = getItem(10, owner);
-//        Item item2 = getItem(11, owner);
-//
-//        Booking booking1 = getBooking(100, booker, item1);
-//        booking1.setStart(LocalDateTime.now().minusDays(10));
-//        booking1.setEnd(LocalDateTime.now().minusDays(9));
-//        Booking booking2 = getBooking(101, booker, item2);
-//        booking2.setStart(LocalDateTime.now().minusDays(8));
-//        booking2.setEnd(LocalDateTime.now().minusDays(7));
-//
-//        List<Booking> bookingList = Arrays.asList(
-//                booking1,
-//                booking2
-//        );
-//
-//        System.out.println(bookingList.size());
-//
-//        when(userRepository.findById(eq(booker.getId()))).thenReturn(Optional.of(booker));
-//        when(bookingRepository.findAllByBookerIdOrderByStartDesc(eq(booker.getId()))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(Pageable.class))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByUserIdAndStartAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(Pageable.class))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByUserIdAndStartBeforeAndEndAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(LocalDateTime.class), any(Pageable.class))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByUserIdAndStatusOrderByStartDesc(eq(booker.getId()), eq(BookingStatus.WAITING), any(Pageable.class))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByUserIdAndStatusOrderByStartDesc(eq(booker.getId()), eq(BookingStatus.REJECTED), any(Pageable.class))).thenReturn(bookingList);
+    @Test
+    void getAllByStateTest() {
+        User owner = getUser(1);
+        User booker = getUser(2);
 
-//        List<BookingResponseDto> responseDtoList;
-//
-//        responseDtoList = bookingService.getAll(booker.getId(), RequestStatus.ALL);
-//        bookingService.getAll(booker.getId(), RequestStatus.PAST);
-//        bookingService.getAll(booker.getId(), RequestStatus.FUTURE);
-//        bookingService.getAll(booker.getId(), RequestStatus.CURRENT);
-//        bookingService.getAll(booker.getId(), RequestStatus.WAITING);
-//        bookingService.getAll(booker.getId(), RequestStatus.REJECTED);
-//
-//        assertThat(responseDtoList.get(0).getId(), equalTo(booking1.getId()));
-//        assertThat(responseDtoList.get(1).getId(), equalTo(booking2.getId()));
-//
-//        verify(userRepository, times(6)).findById(eq(booker.getId()));
-//        verify(bookingRepository, times(1)).findAllByBookerIdOrderByStartDesc(eq(booker.getId()));
-//        verify(bookingRepository, times(1)).findAllByUserIdAndEndBeforeOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(Pageable.class));
-//        verify(bookingRepository, times(1)).findAllByUserIdAndStartAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(Pageable.class));
-//        verify(bookingRepository, times(1)).findAllByUserIdAndStartBeforeAndEndAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(LocalDateTime.class), any(Pageable.class));
-//        verify(bookingRepository, times(1)).findAllByUserIdAndStatusOrderByStartDesc(eq(booker.getId()), eq(BookingStatus.WAITING), any(Pageable.class));
-//        verify(bookingRepository, times(1)).findAllByUserIdAndStatusOrderByStartDesc(eq(booker.getId()), eq(BookingStatus.REJECTED), any(Pageable.class));
+        Item item1 = getItem(10, owner);
+        Item item2 = getItem(11, owner);
 
-//        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
-//    }
+        Booking booking1 = getBooking(100, booker, item1);
+        booking1.setStart(LocalDateTime.now().minusDays(10));
+        booking1.setEnd(LocalDateTime.now().minusDays(9));
+        Booking booking2 = getBooking(101, booker, item2);
+        booking2.setStart(LocalDateTime.now().minusDays(8));
+        booking2.setEnd(LocalDateTime.now().minusDays(7));
 
-//    @Test
-//    void getAllByStateForOwnerTest() {
-//        User owner = getUser(1L);
-//        User booker = getUser(2L);
-//
-//        Item item1 = getItem(10, owner);
-//        Item item2 = getItem(11, owner);
-//
-//        Booking booking1 = getBooking(100, booker, item1);
-//        booking1.setStart(LocalDateTime.now().minusDays(10));
-//        booking1.setEnd(LocalDateTime.now().minusDays(9));
-//        Booking booking2 = getBooking(101, booker, item2);
-//        booking2.setStart(LocalDateTime.now().minusDays(8));
-//        booking2.setEnd(LocalDateTime.now().minusDays(7));
-//
-//        List<Booking> bookingList = Arrays.asList(
-//                booking1,
-//                booking2
-//        );
-//
-//        when(userService.findUserOrNot(eq(owner.getId()))).thenReturn(owner);
-//        when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(eq(owner.getId()))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(eq(owner.getId()), any(LocalDateTime.class))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(eq(owner.getId()), any(LocalDateTime.class))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(eq(owner.getId()), any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(eq(owner.getId()), eq(BookingStatus.WAITING))).thenReturn(bookingList);
-//        when(bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(eq(owner.getId()), eq(BookingStatus.REJECTED))).thenReturn(bookingList);
-//
-//        List<BookingResponseDto> responseDtoList = bookingService.getAllByStateForOwner(RequestStatus.ALL, owner.getId(), 0, 10);
-//
-//        bookingService.getAllOwnersItems(RequestStatus.PAST, owner.getId());
-//        bookingService.getAllOwnersItems(RequestStatus.FUTURE, owner.getId());
-//        bookingService.getAllOwnersItems(RequestStatus.CURRENT, owner.getId());
-//        bookingService.getAllOwnersItems(RequestStatus.WAITING, owner.getId());
-//        bookingService.getAllOwnersItems(RequestStatus.REJECTED, owner.getId());
-//
-//        assertThat(responseDtoList.get(0).getId(), equalTo(booking1.getId()));
-//        assertThat(responseDtoList.get(1).getId(), equalTo(booking2.getId()));
-//
-//        verify(userService, times(5)).findUserOrNot(eq(owner.getId()));
-//        verify(bookingRepository, times(6)).findAllByItemOwnerIdOrderByStartDesc(eq(owner.getId()));
-//        verify(bookingRepository, times(1)).findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(eq(owner.getId()), any(LocalDateTime.class));
-//        verify(bookingRepository, times(1)).findAllByItemOwnerIdAndStartAfterOrderByStartDesc(eq(owner.getId()), any(LocalDateTime.class));
-//        verify(bookingRepository, times(1)).findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(eq(owner.getId()), any(LocalDateTime.class), any(LocalDateTime.class));
-//        verify(bookingRepository, times(1)).findAllByItemOwnerIdAndStatusOrderByStartDesc(eq(owner.getId()), eq(BookingStatus.WAITING));
-//        verify(bookingRepository, times(1)).findAllByItemOwnerIdAndStatusOrderByStartDesc(eq(owner.getId()), eq(BookingStatus.REJECTED));
-//
-//        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
-//    }
+        List<Booking> bookingList = Arrays.asList(
+                booking1,
+                booking2
+        );
+
+        when(userService.findUserOrNot(eq(booker.getId()))).thenReturn(booker);
+        when(bookingRepository.findAllByBookerIdOrderByStartDesc(eq(booker.getId()))).thenReturn(bookingList);
+
+        List<BookingResponseDto> responseDtoList;
+
+        responseDtoList = bookingService.getAll(booker.getId(), RequestStatus.ALL);
+        bookingService.getAll(booker.getId(), RequestStatus.PAST);
+        bookingService.getAll(booker.getId(), RequestStatus.FUTURE);
+        bookingService.getAll(booker.getId(), RequestStatus.CURRENT);
+        bookingService.getAll(booker.getId(), RequestStatus.WAITING);
+        bookingService.getAll(booker.getId(), RequestStatus.REJECTED);
+
+        assertThat(responseDtoList.get(0).getId(), equalTo(booking1.getId()));
+        assertThat(responseDtoList.get(1).getId(), equalTo(booking2.getId()));
+
+        verify(userService, times(6)).findUserOrNot(eq(booker.getId()));
+        verify(bookingRepository, times(6)).findAllByBookerIdOrderByStartDesc(eq(booker.getId()));
+
+        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
+    }
+
+    @Test
+    void getAllByStateForOwnerTest() {
+        User owner = getUser(1L);
+        User booker = getUser(2L);
+
+        Item item1 = getItem(10, owner);
+        Item item2 = getItem(11, owner);
+
+        Booking booking1 = getBooking(100, booker, item1);
+        booking1.setStart(LocalDateTime.now().minusDays(10));
+        booking1.setEnd(LocalDateTime.now().minusDays(9));
+        Booking booking2 = getBooking(101, booker, item2);
+        booking2.setStart(LocalDateTime.now().minusDays(8));
+        booking2.setEnd(LocalDateTime.now().minusDays(7));
+
+        List<Booking> bookingList = Arrays.asList(
+                booking1,
+                booking2
+        );
+
+        when(userService.findUserOrNot(eq(owner.getId()))).thenReturn(owner);
+        when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(eq(owner.getId()))).thenReturn(bookingList);
+
+        List<BookingResponseDto> responseDtoList = bookingService.getAllByStateForOwner(RequestStatus.ALL, owner.getId(), 0, 10);
+
+        bookingService.getAllOwnersItems(RequestStatus.PAST, owner.getId());
+        bookingService.getAllOwnersItems(RequestStatus.FUTURE, owner.getId());
+        bookingService.getAllOwnersItems(RequestStatus.CURRENT, owner.getId());
+        bookingService.getAllOwnersItems(RequestStatus.WAITING, owner.getId());
+        bookingService.getAllOwnersItems(RequestStatus.REJECTED, owner.getId());
+
+        assertThat(responseDtoList.get(0).getId(), equalTo(booking1.getId()));
+        assertThat(responseDtoList.get(1).getId(), equalTo(booking2.getId()));
+
+        verify(userService, times(5)).findUserOrNot(eq(owner.getId()));
+        verify(bookingRepository, times(6)).findAllByItemOwnerIdOrderByStartDesc(eq(owner.getId()));
+
+        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
+    }
 
     @Test
     void createTest() {
@@ -279,62 +262,44 @@ public class BookingServiceTest {
         verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
     }
 
-//    @Test
-//    void approveTest() {
-//        User owner = getUser(1);
-//        User booker = getUser(2);
-//
-//        Item item = getItem(10, owner);
-//
-//        System.out.println(item.getId());
-//
-//        Booking booking = getBooking(100, booker, item);
-//
-//
-//
-//        booking.setStatus(BookingStatus.WAITING);
-//
-//        when(bookingRepository.findById(eq(booking.getId()))).thenReturn(Optional.ofNullable(booking));
-//        when(userRepository.findById(eq(owner.getId()))).thenReturn(Optional.ofNullable(owner));
-//        when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
-//
-//        BookingResponseDto responseDto = bookingService.approve(booking.getId(), true, owner.getId());
-//
-//        assertThat(responseDto.getId(), equalTo(booking.getId()));
-//        assertThat(responseDto.getStatus(), equalTo(booking.getStatus()));
-//        assertThat(responseDto.getBooker().getId(), equalTo(booker.getId()));
-//        assertThat(responseDto.getItem().getId(), equalTo(item.getId()));
-//        assertThat(responseDto.getItem().getName(), equalTo(item.getName()));
-//
-//        verify(bookingRepository, times(1)).findById(eq(booking.getId()));
-//        verify(userRepository, times(1)).findById(eq(owner.getId()));
-//        verify(bookingRepository, times(1)).save(any(Booking.class));
-//        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
-//    }
-//
-//    @Test
-//    void approveTest_ByNotOwner() {
-//        User owner = getUser(1);
-//        User booker = getUser(2);
-//
-//        Item item = getItem(10, owner);
-//
-//        Booking booking = getBooking(100, booker, item);
-//        booking.setStatus(BookingStatus.WAITING);
-//
-//        when(bookingRepository.findById(eq(booking.getId()))).thenReturn(Optional.ofNullable(booking));
-//        when(userRepository.findById(eq(booker.getId()))).thenReturn(Optional.ofNullable(booker));
-//
-//        ResponseStatusException e = assertThrows(ResponseStatusException.class, () -> {
-//            bookingService.approve(booking.getId(), true, booker.getId());
-//        });
-//
-//        assertThat(e.getStatusCode(), equalTo(NOT_FOUND));
-//
-//        verify(bookingRepository, times(1)).findById(eq(booking.getId()));
-//        verify(userRepository, times(1)).findById(eq(booker.getId()));
-//        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository);
-//    }
+    @Test
+    void approveTest() {
+        User owner = getUser(1);
+        User booker = getUser(2);
+
+        Item item = getItem(10, owner);
+
+        Booking booking = getBooking(100, booker, item);
+
+        booking.setStatus(BookingStatus.WAITING);
+
+        when(bookingRepository.findById(eq(booking.getId()))).thenReturn(Optional.of(booking));
+
+        BookingResponseDto responseDto = bookingService.approve(booking.getId(), true, owner.getId());
+
+        assertThat(responseDto.getId(), equalTo(booking.getId()));
+        assertThat(responseDto.getStatus(), equalTo(booking.getStatus()));
+        assertThat(responseDto.getBooker().getId(), equalTo(booker.getId()));
+        assertThat(responseDto.getItem().getId(), equalTo(item.getId()));
+        assertThat(responseDto.getItem().getName(), equalTo(item.getName()));
+    }
+
+    @Test
+    void approveTest_ByNotOwner() {
+        User owner = getUser(1);
+        User booker = getUser(2);
+
+        Item item = getItem(10, owner);
+
+        Booking booking = getBooking(100, booker, item);
+        booking.setStatus(BookingStatus.WAITING);
+
+        ResponseStatusException e = assertThrows(ResponseStatusException.class, () -> {
+            bookingService.approve(booking.getId(), true, booker.getId());
+        });
+
+        assertThat(e.getStatusCode(), equalTo(NOT_FOUND));
+    }
 //
 //    @Test
 //    void approveTest_ForNotWaitingBooking() {

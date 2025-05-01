@@ -149,6 +149,28 @@ public class ItemControllerTest {
         verifyNoMoreInteractions(itemService);
     }
 
+    @Test
+    void getAllBySearchTextTest() throws Exception {
+        ItemDto responseDto1 = getItemResponseDto(10);
+        ItemDto responseDto2 = getItemResponseDto(11);
+
+        List<ItemDto> responseDtoList = Arrays.asList(
+                responseDto1,
+                responseDto2
+        );
+
+        when(itemService.search(anyString())).thenReturn(responseDtoList);
+
+        mockMvc.perform(get("/items/search")
+                        .param("text", "someText"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(responseDto1.getId()))
+                .andExpect(jsonPath("$[1].id").value(responseDto2.getId()));
+
+        verify(itemService, times(2)).search(eq("someText"));
+        verifyNoMoreInteractions(itemService);
+    }
+
     private ItemDto getRequestDto(long id) {
         return ItemDto.builder()
                 .id(id)

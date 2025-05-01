@@ -25,11 +25,8 @@ public class Item {
     @Column(name = "item_id")
     private Long id;
     @Column(name = "item_name")
-    @NotBlank(groups = Marker.OnCreate.class)
     private String name;
-    @NotEmpty(groups = Marker.OnCreate.class)
     private String description;
-    @NotEmpty(groups = Marker.OnCreate.class)
     private Boolean available;
 
     @ManyToOne

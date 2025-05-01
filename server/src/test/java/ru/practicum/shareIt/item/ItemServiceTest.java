@@ -10,6 +10,7 @@ import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -215,6 +216,37 @@ public class ItemServiceTest {
         verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
     }
 
+//    @Test
+//    void createCommentTest() {
+//        User user = getUser(1);
+//        Item item = getItem(1);
+//
+//        Comment comment = getComment(100);
+//        comment.setItem(item);
+//        comment.setAuthor(user);
+//
+//        CommentDto createDto = CommentDto.builder().build();
+
+//        when(userService.findUserOrNot(eq(user.getId()))).thenReturn(user);
+
+
+////        when(itemService.findItemOrNot(eq(item.getId()))).thenReturn(item);
+//        when(bookingRepository.findAllApprovedByItemIdAndBookerId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class))).thenReturn(List.of(new Booking()));
+//        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
+
+//        CommentDto resultDto = itemService.createComment(createDto, user.getId(), item.getId());
+//
+//        assertThat(resultDto.getId(), equalTo(comment.getId()));
+//        assertThat(resultDto.getText(), equalTo(comment.getText()));
+//        assertThat(resultDto.getAuthorName(), equalTo(user.getName()));
+
+//        verify(userRepository, times(1)).findById(eq(user.getId()));
+//        verify(itemRepository, times(1)).findById(eq(item.getId()));
+//        verify(bookingRepository, times(1)).findAllApprovedByItemIdAndBookerId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class));
+//        verify(commentRepository, times(1)).save(any(Comment.class));
+//        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
+//    }
+
     private User getUser(long id) {
         return User.builder()
                 .id(id)
@@ -227,7 +259,7 @@ public class ItemServiceTest {
         return Item.builder()
                 .id(id)
                 .name("Item " + id)
-                .description("ItemDescr " + id)
+                .description("ItemDescription " + id)
                 .available(true)
                 .build();
     }
