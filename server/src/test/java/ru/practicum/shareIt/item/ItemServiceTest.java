@@ -1,5 +1,6 @@
 package ru.practicum.shareIt.item;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
@@ -34,6 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @ContextConfiguration(classes = ShareItServer.class)
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
@@ -62,12 +65,45 @@ public class ItemServiceTest {
     private ItemRequestRepository itemRequestRepository;
 
     @Test
+    void createTest() {
+        User user = getUser(1);
+
+        ItemRequest itemRequest = getItemRequest(10);
+
+        Item item = getItem(100L);
+        item.setOwner(user);
+        item.setItemRequest(itemRequest);
+
+        when(userService.findUserOrNot(eq(user.getId()))).thenReturn(user);
+        when(itemRequestService.getItemRequestOrNot(item.getItemRequest().getId())).thenReturn(itemRequest);
+        when(itemRepository.save(any(Item.class))).thenReturn(item);
+
+        ItemDto inputDto = ItemMapper.INSTANCE.itemToItemDto(item);
+
+        ItemDto resultDto = itemService.createItem(inputDto, user.getId());
+
+        assertThat(resultDto.getId(), equalTo(item.getId()));
+        assertThat(resultDto.getName(), equalTo(item.getName()));
+        assertThat(resultDto.getDescription(), equalTo(item.getDescription()));
+        assertThat(resultDto.getAvailable(), equalTo(item.getAvailable()));
+        assertThat(resultDto.getRequestId(), equalTo(itemRequest.getId()));
+
+        verify(itemRepository, times(1)).save(any(Item.class));
+        verify(userService, times(1)).findUserOrNot(eq(user.getId()));
+        verify(itemRequestService, times(1)).getItemRequestOrNot(eq(item.getItemRequest().getId()));
+        verifyNoMoreInteractions(userService, itemRepository, itemRequestService);
+    }
+
+    @Test
     void getByIdAsOwnerTest() {
         User owner = getUser(1);
         User booker = getUser(2);
 
         Item item = getItem(10);
         item.setOwner(owner);
+
+        ItemRequest itemRequest = getItemRequest(10);
+        item.setItemRequest(itemRequest);
 
         Booking lastBooking = getBooking(100, booker, item);
         lastBooking.setStart(LocalDateTime.now().minusDays(2));
@@ -93,9 +129,10 @@ public class ItemServiceTest {
                 comment2
         );
 
-        when(itemRepository.findById(eq(item.getId()))).thenReturn(Optional.ofNullable(item));
+        when(itemRepository.findById(eq(item.getId()))).thenReturn(Optional.of(item));
         when(bookingRepository.findAllByItemId(eq(item.getId()))).thenReturn(bookingList);
         when(commentRepository.findAllByItemId(eq(item.getId()))).thenReturn(commentList);
+        when(itemRequestService.getItemRequestOrNot(item.getItemRequest().getId())).thenReturn(itemRequest);
 
         ItemDto resultDto = itemService.get(item.getId(), owner.getId());
 
@@ -120,6 +157,7 @@ public class ItemServiceTest {
         verify(itemRepository, times(1)).findById(eq(item.getId()));
         verify(bookingRepository, times(1)).findAllByItemId(eq(item.getId()));
         verify(commentRepository, times(1)).findAllByItemId(eq(item.getId()));
+        verify(itemRequestService, times(1)).getItemRequestOrNot(eq(item.getItemRequest().getId()));
         verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
     }
 
@@ -245,6 +283,52 @@ public class ItemServiceTest {
 //        verify(commentRepository, times(1)).save(any(Comment.class));
 //        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
 //    }
+
+@Test
+void getAllByOwnerIdTest() {
+    User owner = getUser(1);
+    User booker = getUser(2);
+
+    Item item1 = getItem(10);
+    item1.setOwner(owner);
+
+    Item item2 = getItem(11);
+    item2.setOwner(owner);
+
+    List<Item> itemList = Arrays.asList(
+            item1,
+            item2
+    );
+
+    Booking item1lastBooking = getBooking(100, booker, item1);
+    item1lastBooking.setStart(LocalDateTime.now().minusDays(2));
+    item1lastBooking.setEnd(LocalDateTime.now().minusDays(1));
+
+    Booking item1nextBooking = getBooking(101, booker, item1);
+    item1nextBooking.setStart(LocalDateTime.now().plusDays(1));
+    item1nextBooking.setEnd(LocalDateTime.now().plusDays(2));
+
+    when(itemRepository.findAllByOwnerId(eq(owner.getId()))).thenReturn(itemList);
+
+    List<ItemDto> resultDtoList = itemService.getAll(owner.getId());
+
+    assertThat(resultDtoList.size(), equalTo(2));
+    assertThat(resultDtoList.getFirst().getId(), equalTo(item1.getId()));
+    assertThat(resultDtoList.getFirst().getName(), equalTo(item1.getName()));
+    assertThat(resultDtoList.get(0).getDescription(), equalTo(item1.getDescription()));
+    assertThat(resultDtoList.get(0).getAvailable(), equalTo(item1.getAvailable()));
+
+    assertThat(resultDtoList.get(1).getId(), equalTo(item2.getId()));
+    assertThat(resultDtoList.get(1).getName(), equalTo(item2.getName()));
+    assertThat(resultDtoList.get(1).getDescription(), equalTo(item2.getDescription()));
+    assertThat(resultDtoList.get(1).getAvailable(), equalTo(item2.getAvailable()));
+
+    assertThat(resultDtoList.get(1).getNextBooking(), equalTo(null));
+    assertThat(resultDtoList.get(1).getLastBooking(), equalTo(null));
+
+    verify(itemRepository, times(1)).findAllByOwnerId(eq(owner.getId()));
+    verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
+}
 
     private User getUser(long id) {
         return User.builder()
