@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
