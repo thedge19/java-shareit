@@ -135,16 +135,10 @@ public class BookingServiceImplementation implements BookingService {
 
 
         return switch (requestBookingStatus) {
-            case ALL -> {
-                log.info("Пользователь: {}", userId);
-                List<BookingResponseDto> dtos = bookingRepository.findAllByBookerIdOrderByStartDesc(userId).stream()
+            case ALL ->
+                    bookingRepository.findAllByBookerIdOrderByStartDesc(userId).stream()
                         .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
                         .collect(Collectors.toList());
-                log.warn("Длина списка {}", dtos.size());
-
-                yield dtos;
-
-            }
             case PAST ->
                     bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now()).stream()
                             .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)

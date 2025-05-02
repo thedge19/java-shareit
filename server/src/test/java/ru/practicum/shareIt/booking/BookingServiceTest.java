@@ -121,7 +121,7 @@ public class BookingServiceTest {
         );
 
         when(userService.findUserOrNot(eq(booker.getId()))).thenReturn(booker);
-        when(bookingRepository.findAllByItemOwnerIdOrderByStartDesc(eq(booker.getId()))).thenReturn(bookingList);
+        when(bookingRepository.findAllByBookerIdOrderByStartDesc(eq(booker.getId()))).thenReturn(bookingList);
         when(bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class))).thenReturn(bookingList);
         when(bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class))).thenReturn(bookingList);
         when(bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(bookingList);
@@ -141,7 +141,7 @@ public class BookingServiceTest {
         assertThat(responseDtoList.get(1).getId(), equalTo(booking2.getId()));
 
         verify(userService, times(6)).findUserOrNot(eq(booker.getId()));
-        verify(bookingRepository, times(1)).findAllByItemOwnerIdOrderByStartDesc(eq(booker.getId()));
+        verify(bookingRepository, times(1)).findAllByBookerIdOrderByStartDesc(eq(booker.getId()));
         verify(bookingRepository, times(1)).findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class));
         verify(bookingRepository, times(1)).findAllByItemOwnerIdAndStartAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class));
         verify(bookingRepository, times(1)).findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(eq(booker.getId()), any(LocalDateTime.class), any(LocalDateTime.class));
