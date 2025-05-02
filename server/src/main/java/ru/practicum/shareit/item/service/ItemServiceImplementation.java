@@ -22,10 +22,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -88,17 +85,9 @@ public class ItemServiceImplementation implements ItemService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not allowed to update this item");
         }
 
-        if (itemDto.getName() != null && !itemDto.getName().isEmpty()) {
-            item.setName(itemDto.getName());
-        }
-
-        if (itemDto.getDescription() != null && !itemDto.getDescription().isEmpty()) {
-            item.setDescription(itemDto.getDescription());
-        }
-
-        if (itemDto.getAvailable() != null) {
-            item.setAvailable(itemDto.getAvailable());
-        }
+        Optional.ofNullable(itemDto.getName()).ifPresent(item::setName);
+        Optional.ofNullable(itemDto.getDescription()).ifPresent(item::setDescription);
+        Optional.ofNullable(itemDto.getAvailable()).ifPresent(item::setAvailable);
 
         return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(item));
     }
@@ -123,13 +112,14 @@ public class ItemServiceImplementation implements ItemService {
         User author = userService.findUserOrNot(userId);
         Item item = findItemOrNot(itemId);
         Comment comment = CommentMapper.INSTANCE.dtoToComment(commentDto, userId, itemId);
-        comment.setItem(item);
-        comment.setAuthor(author);
-        comment.setCreated(LocalDateTime.now());
 
         if (bookingRepository.findAllApprovedByItemIdAndBookerId(itemId, userId, LocalDateTime.now()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Комментарии можно оставлять только к тем вещам, на которые было бронирование");
         }
+
+        comment.setItem(item);
+        comment.setAuthor(author);
+        comment.setCreated(LocalDateTime.now());
 
         return CommentMapper.INSTANCE.commentToDto(commentRepository.save(comment));
     }

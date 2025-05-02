@@ -62,11 +62,6 @@ public class UserServiceImplementation implements UserService {
         return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private boolean emailCheck(User user) {
-
-        return userRepository.findAll().stream().anyMatch(u -> user.getEmail().equals(u.getEmail()));
-    }
-
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> getAll() {

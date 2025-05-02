@@ -268,66 +268,102 @@ public class ItemServiceTest {
         Item item = getItem(10);
         item.setOwner(owner);
 
-        when(itemRepository.findById(eq(item.getId()))).thenReturn(Optional.ofNullable(item));
+        when(itemRepository.findById(eq(item.getId()))).thenReturn(Optional.of(item));
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
         ItemDto resultDto = itemService.updateItem(inputDto, item.getId(), owner.getId());
+        Item resultItem = ItemMapper.INSTANCE.itemDtoToItem(resultDto);
+
+        log.info(resultItem.toString());
 
         assertThat(resultDto.getId(), equalTo(item.getId()));
         assertThat(resultDto.getName(), equalTo(item.getName()));
         assertThat(resultDto.getDescription(), equalTo(item.getDescription()));
         assertThat(resultDto.getAvailable(), equalTo(item.getAvailable()));
+//        assertThat(resultDto., equalTo(item));
 
         verify(itemRepository, times(1)).findById(eq(item.getId()));
         verify(itemRepository, times(1)).save(any(Item.class));
         verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
     }
 
-@Test
-void getAllByOwnerIdTest() {
-    User owner = getUser(1);
-    User booker = getUser(2);
+    @Test
+    void getAllByOwnerIdTest() {
+        User owner = getUser(1);
+        User booker = getUser(2);
 
-    Item item1 = getItem(10);
-    item1.setOwner(owner);
+        Item item1 = getItem(10);
+        item1.setOwner(owner);
 
-    Item item2 = getItem(11);
-    item2.setOwner(owner);
+        Item item2 = getItem(11);
+        item2.setOwner(owner);
 
-    List<Item> itemList = Arrays.asList(
-            item1,
-            item2
-    );
+        List<Item> itemList = Arrays.asList(
+                item1,
+                item2
+        );
 
-    Booking item1lastBooking = getBooking(100, booker, item1);
-    item1lastBooking.setStart(LocalDateTime.now().minusDays(2));
-    item1lastBooking.setEnd(LocalDateTime.now().minusDays(1));
+        Booking item1lastBooking = getBooking(100, booker, item1);
+        item1lastBooking.setStart(LocalDateTime.now().minusDays(2));
+        item1lastBooking.setEnd(LocalDateTime.now().minusDays(1));
 
-    Booking item1nextBooking = getBooking(101, booker, item1);
-    item1nextBooking.setStart(LocalDateTime.now().plusDays(1));
-    item1nextBooking.setEnd(LocalDateTime.now().plusDays(2));
+        Booking item1nextBooking = getBooking(101, booker, item1);
+        item1nextBooking.setStart(LocalDateTime.now().plusDays(1));
+        item1nextBooking.setEnd(LocalDateTime.now().plusDays(2));
 
-    when(itemRepository.findAllByOwnerId(eq(owner.getId()))).thenReturn(itemList);
+        when(itemRepository.findAllByOwnerId(eq(owner.getId()))).thenReturn(itemList);
 
-    List<ItemDto> resultDtoList = itemService.getAll(owner.getId());
+        List<ItemDto> resultDtoList = itemService.getAll(owner.getId());
 
-    assertThat(resultDtoList.size(), equalTo(2));
-    assertThat(resultDtoList.getFirst().getId(), equalTo(item1.getId()));
-    assertThat(resultDtoList.getFirst().getName(), equalTo(item1.getName()));
-    assertThat(resultDtoList.get(0).getDescription(), equalTo(item1.getDescription()));
-    assertThat(resultDtoList.get(0).getAvailable(), equalTo(item1.getAvailable()));
+        assertThat(resultDtoList.size(), equalTo(2));
+        assertThat(resultDtoList.getFirst().getId(), equalTo(item1.getId()));
+        assertThat(resultDtoList.getFirst().getName(), equalTo(item1.getName()));
+        assertThat(resultDtoList.get(0).getDescription(), equalTo(item1.getDescription()));
+        assertThat(resultDtoList.get(0).getAvailable(), equalTo(item1.getAvailable()));
 
-    assertThat(resultDtoList.get(1).getId(), equalTo(item2.getId()));
-    assertThat(resultDtoList.get(1).getName(), equalTo(item2.getName()));
-    assertThat(resultDtoList.get(1).getDescription(), equalTo(item2.getDescription()));
-    assertThat(resultDtoList.get(1).getAvailable(), equalTo(item2.getAvailable()));
+        assertThat(resultDtoList.get(1).getId(), equalTo(item2.getId()));
+        assertThat(resultDtoList.get(1).getName(), equalTo(item2.getName()));
+        assertThat(resultDtoList.get(1).getDescription(), equalTo(item2.getDescription()));
+        assertThat(resultDtoList.get(1).getAvailable(), equalTo(item2.getAvailable()));
 
-    assertThat(resultDtoList.get(1).getNextBooking(), equalTo(null));
-    assertThat(resultDtoList.get(1).getLastBooking(), equalTo(null));
+        assertThat(resultDtoList.get(1).getNextBooking(), equalTo(null));
+        assertThat(resultDtoList.get(1).getLastBooking(), equalTo(null));
 
-    verify(itemRepository, times(1)).findAllByOwnerId(eq(owner.getId()));
-    verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
-}
+        verify(itemRepository, times(1)).findAllByOwnerId(eq(owner.getId()));
+        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
+    }
+
+//    @Test
+//    void createCommentTest() {
+//        User user = getUser(1);
+//        Item item = getItem(10);
+//
+//        Comment comment = getComment(100);
+//        comment.setItem(item);
+//        comment.setAuthor(user);
+//
+//        CommentDto createDto = CommentDto.builder().build();
+//
+//        log.info(createDto.toString());
+//
+//        when(userService.findUserOrNot(eq(user.getId()))).thenReturn(user);
+//        when(itemService.findItemOrNot(eq(item.getId()))).thenReturn(item);
+////        when(bookingRepository.findAllApprovedByItemIdAndUserId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class))).thenReturn(Arrays.asList(new Booking()));
+//        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
+////
+//        CommentDto resultDto = itemService.createComment(createDto, user.getId(), 10);
+////
+//        assertThat(resultDto.getId(), equalTo(comment.getId()));
+////        assertThat(resultDto.getText(), equalTo(comment.getText()));
+////        assertThat(resultDto.getAuthorName(), equalTo(user.getName()));
+////
+//        verify(userService, times(1)).findUserOrNot(eq(user.getId()));
+//        verify(itemService, times(1)).findItemOrNot(eq(item.getId()));
+////        verify(bookingRepository, times(1)).findAllApprovedByItemIdAndUserId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class));
+//        verify(commentRepository, times(1)).save(any(Comment.class));
+////        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
+//    }
+
 
     private User getUser(long id) {
         return User.builder()
