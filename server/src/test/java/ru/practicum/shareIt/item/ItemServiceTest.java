@@ -179,11 +179,6 @@ public class ItemServiceTest {
         nextBooking.setStart(LocalDateTime.now().plusDays(1));
         nextBooking.setEnd(LocalDateTime.now().plusDays(2));
 
-        List<Booking> bookingList = Arrays.asList(
-                lastBooking,
-                nextBooking
-        );
-
         Comment comment1 = getComment(1000);
         comment1.setAuthor(booker);
 
@@ -195,7 +190,7 @@ public class ItemServiceTest {
                 comment2
         );
 
-        when(itemRepository.findById(eq(item.getId()))).thenReturn(Optional.ofNullable(item));
+        when(itemRepository.findById(eq(item.getId()))).thenReturn(Optional.of(item));
         when(commentRepository.findAllByItemId(eq(item.getId()))).thenReturn(commentList);
 
         ItemDto resultDto = itemService.get(item.getId(), notOwner.getId());
