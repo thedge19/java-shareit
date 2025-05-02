@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -58,10 +60,11 @@ public class BookingServiceImplementation implements BookingService {
     @Override
     @Transactional
     public BookingResponseDto approve(long bookingId, boolean approved, long userId) {
+
         Booking updatedBooking = getBookingOrNot(bookingId);
 
-        if (updatedBooking.getItem().getOwner().getId() != userId) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Подтверждение доступно только для владельца вещи");
+        if (!updatedBooking.getItem().getOwner().getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Подтверждение доступно только для владельца вещи");
         }
 
         if (updatedBooking.getStatus() != BookingStatus.WAITING) {
@@ -130,10 +133,18 @@ public class BookingServiceImplementation implements BookingService {
 
         userService.findUserOrNot(userId);
 
+
         return switch (requestBookingStatus) {
-            case ALL -> bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId).stream()
-                    .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
-                    .collect(Collectors.toList());
+            case ALL -> {
+                log.info("Пользователь: {}", userId);
+                List<BookingResponseDto> dtos = bookingRepository.findAllByBookerIdOrderByStartDesc(userId).stream()
+                        .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                        .collect(Collectors.toList());
+                log.warn("Длина списка {}", dtos.size());
+
+                yield dtos;
+
+            }
             case PAST ->
                     bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now()).stream()
                             .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)

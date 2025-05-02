@@ -36,9 +36,9 @@ public class BookingController {
             @PathVariable long bookingId,
             @RequestParam boolean approved,
             @RequestHeader(BOOKER_ID) long bookerId) {
-        log.info("Обновляется бронирование с id={}", bookingId);
+        log.info("Подтверждается бронирование с id={}", bookingId);
         BookingResponseDto responseDto = bookingService.approve(bookingId, approved, bookerId);
-        log.info("Обновлено бронирование {}", responseDto);
+        log.info("Подтверждено бронирование {}", responseDto);
         return responseDto;
     }
 
@@ -56,8 +56,11 @@ public class BookingController {
             @RequestParam(required = false, defaultValue = "0") int from,
             @RequestParam(required = false, defaultValue = "20") int size,
             @RequestHeader(BOOKER_ID) long bookerId
-            ) {
+    ) {
         log.info("Запрашиваются бронирования пользователя с id={} и state={}", bookerId, state);
+        if (bookerId == 48) {
+            log.warn("Вот он сука!");
+        }
         return bookingService.getAllByState(state, bookerId, from, size);
     }
 
