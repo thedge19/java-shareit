@@ -110,7 +110,7 @@ public class ItemServiceImplementation implements ItemService {
     public CommentDto createComment(CommentDto commentDto, long userId, long itemId) {
 
         User author = userService.findUserOrNot(userId);
-        Item item = findItemOrNot(itemId);
+        Item item = itemRepository.findById(itemId).orElse(null);
         Comment comment = CommentMapper.INSTANCE.dtoToComment(commentDto, userId, itemId);
 
         if (bookingRepository.findAllApprovedByItemIdAndBookerId(itemId, userId, LocalDateTime.now()).isEmpty()) {

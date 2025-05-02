@@ -11,6 +11,7 @@ import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
@@ -333,36 +334,36 @@ public class ItemServiceTest {
         verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
     }
 
-//    @Test
-//    void createCommentTest() {
-//        User user = getUser(1);
-//        Item item = getItem(10);
-//
-//        Comment comment = getComment(100);
-//        comment.setItem(item);
-//        comment.setAuthor(user);
-//
-//        CommentDto createDto = CommentDto.builder().build();
-//
-//        log.info(createDto.toString());
-//
-//        when(userService.findUserOrNot(eq(user.getId()))).thenReturn(user);
-//        when(itemService.findItemOrNot(eq(item.getId()))).thenReturn(item);
-////        when(bookingRepository.findAllApprovedByItemIdAndUserId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class))).thenReturn(Arrays.asList(new Booking()));
-//        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
-////
-//        CommentDto resultDto = itemService.createComment(createDto, user.getId(), 10);
-////
-//        assertThat(resultDto.getId(), equalTo(comment.getId()));
-////        assertThat(resultDto.getText(), equalTo(comment.getText()));
-////        assertThat(resultDto.getAuthorName(), equalTo(user.getName()));
-////
-//        verify(userService, times(1)).findUserOrNot(eq(user.getId()));
-//        verify(itemService, times(1)).findItemOrNot(eq(item.getId()));
-////        verify(bookingRepository, times(1)).findAllApprovedByItemIdAndUserId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class));
-//        verify(commentRepository, times(1)).save(any(Comment.class));
-////        verifyNoMoreInteractions(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
-//    }
+    @Test
+    void createCommentTest() {
+        User user = getUser(1);
+        Item item = getItem(10);
+
+        Comment comment = getComment(100);
+        comment.setItem(item);
+        comment.setAuthor(user);
+
+        CommentDto createDto = CommentDto.builder().build();
+
+        log.info(createDto.toString());
+
+        when(userService.findUserOrNot(eq(user.getId()))).thenReturn(user);
+        when(itemRepository.findById(eq(item.getId()))).thenReturn(Optional.of(item));
+        when(bookingRepository.findAllApprovedByItemIdAndBookerId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class))).thenReturn(Arrays.asList(new Booking()));
+        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
+
+        CommentDto resultDto = itemService.createComment(createDto, user.getId(), item.getId());
+
+        assertThat(resultDto.getId(), equalTo(comment.getId()));
+        assertThat(resultDto.getText(), equalTo(comment.getText()));
+        assertThat(resultDto.getAuthorName(), equalTo(user.getName()));
+
+        verify(userService, times(1)).findUserOrNot(eq(user.getId()));
+        verify(itemRepository, times(1)).findById(eq(item.getId()));
+        verify(bookingRepository, times(1)).findAllApprovedByItemIdAndBookerId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class));
+        verify(commentRepository, times(1)).save(any(Comment.class));
+        verifyNoMoreInteractions(itemRepository, userService, bookingRepository, commentRepository);
+    }
 
 
     private User getUser(long id) {
