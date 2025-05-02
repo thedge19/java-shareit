@@ -67,7 +67,7 @@ public class BookingControllerTest {
                 responseDto2
         );
 
-        when(bookingService.getAll(eq(userId), any())).thenReturn(responseDtoList);
+        when(bookingService.getAllByState(any(), eq(userId), anyInt(), anyInt())).thenReturn(responseDtoList);
 
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", userId))
@@ -75,7 +75,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$[0].id").value(responseDto1.getId()))
                 .andExpect(jsonPath("$[1].id").value(responseDto2.getId()));
 
-        verify(bookingService, times(1)).getAll(eq(userId), eq(RequestStatus.ALL));
+        verify(bookingService, times(1)).getAllByState(eq(RequestStatus.ALL), eq(userId), anyInt(), anyInt());
         verifyNoMoreInteractions(bookingService);
     }
 

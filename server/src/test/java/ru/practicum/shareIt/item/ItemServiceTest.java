@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -29,10 +31,12 @@ import ru.practicum.shareit.user.service.UserServiceImplementation;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -268,15 +272,11 @@ public class ItemServiceTest {
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
         ItemDto resultDto = itemService.updateItem(inputDto, item.getId(), owner.getId());
-        Item resultItem = ItemMapper.INSTANCE.itemDtoToItem(resultDto);
-
-        log.info(resultItem.toString());
 
         assertThat(resultDto.getId(), equalTo(item.getId()));
         assertThat(resultDto.getName(), equalTo(item.getName()));
         assertThat(resultDto.getDescription(), equalTo(item.getDescription()));
         assertThat(resultDto.getAvailable(), equalTo(item.getAvailable()));
-//        assertThat(resultDto., equalTo(item));
 
         verify(itemRepository, times(1)).findById(eq(item.getId()));
         verify(itemRepository, times(1)).save(any(Item.class));
@@ -358,6 +358,21 @@ public class ItemServiceTest {
         verify(bookingRepository, times(1)).findAllApprovedByItemIdAndBookerId(eq(item.getId()), eq(user.getId()), any(LocalDateTime.class));
         verify(commentRepository, times(1)).save(any(Comment.class));
         verifyNoMoreInteractions(itemRepository, userService, bookingRepository, commentRepository);
+    }
+
+    @Test
+    void tryToUpdateByNotOwnerTest() {
+        ItemDto inputDto = ItemDto.builder().build();
+
+        User owner = getUser(1);
+        User notOwner = getUser(2);
+
+        Item item = getItem(100L);
+        item.setOwner(owner);
+
+        assertThrows(ResponseStatusException.class,
+                () -> itemService.updateItem(inputDto, item.getId(),
+                        notOwner.getId()));
     }
 
 

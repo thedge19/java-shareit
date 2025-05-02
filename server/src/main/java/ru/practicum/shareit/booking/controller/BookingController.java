@@ -53,10 +53,12 @@ public class BookingController {
     @GetMapping()
     public List<BookingResponseDto> getAll(
             @RequestParam(defaultValue = "ALL") RequestStatus state,
+            @RequestParam(required = false, defaultValue = "0") int from,
+            @RequestParam(required = false, defaultValue = "20") int size,
             @RequestHeader(BOOKER_ID) long bookerId
             ) {
         log.info("Запрашиваются бронирования пользователя с id={} и state={}", bookerId, state);
-        return bookingService.getAll(bookerId, state);
+        return bookingService.getAllByState(state, bookerId, from, size);
     }
 
     @GetMapping("/owner")

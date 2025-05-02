@@ -87,24 +87,36 @@ public class BookingServiceImplementation implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getAll(long bookerId, RequestStatus state) {
-        userService.findUserOrNot(bookerId);
-
-        return bookingRepository
-                .findAllByBookerIdOrderByStartDesc(bookerId)
-                .stream()
-                .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
-                .toList();
-    }
-
-    @Override
     public List<BookingResponseDto> getAllOwnersItems(RequestStatus requestStatus, long ownerId) {
+
         userService.findUserOrNot(ownerId);
 
-        return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId)
-                .stream()
-                .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
-                .toList();
+        return switch (requestStatus) {
+            case ALL -> bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId).stream()
+                    .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                    .collect(Collectors.toList());
+            case PAST ->
+                    bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId, LocalDateTime.now()).stream()
+                            .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                            .collect(Collectors.toList());
+            case FUTURE ->
+                    bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(ownerId, LocalDateTime.now()).stream()
+                            .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                            .collect(Collectors.toList());
+            case CURRENT ->
+                    bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(ownerId, LocalDateTime.now(), LocalDateTime.now()).stream()
+                            .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                            .collect(Collectors.toList());
+            case WAITING ->
+                    bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingStatus.WAITING).stream()
+                            .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                            .collect(Collectors.toList());
+            case REJECTED ->
+                    bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED).stream()
+                            .map(BookingMapper.INSTANCE::bookingToBookingResponseDto)
+                            .collect(Collectors.toList());
+            default -> throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "Неизвестный статус бронирования");
+        };
     }
 
     @Override

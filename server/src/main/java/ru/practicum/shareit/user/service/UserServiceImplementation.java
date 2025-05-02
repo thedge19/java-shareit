@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -40,12 +41,8 @@ public class UserServiceImplementation implements UserService {
     @Override
     public UserDto updateUser(UserDto userDto, long id) {
         User updatedUser = findUserOrNot(id);
-        if (userDto.getName() != null) {
-            updatedUser.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null) {
-            updatedUser.setEmail(userDto.getEmail());
-        }
+        Optional.ofNullable(userDto.getName()).ifPresent(updatedUser::setName);
+        Optional.ofNullable(userDto.getEmail()).ifPresent(updatedUser::setEmail);
 
         return UserMapper.INSTANCE.userToUserDto(updatedUser);
     }

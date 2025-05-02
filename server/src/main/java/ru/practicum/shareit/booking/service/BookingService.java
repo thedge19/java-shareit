@@ -16,8 +16,6 @@ public interface BookingService {
 
     BookingResponseDto get(long bookingId, long bookerId);
 
-    List<BookingResponseDto> getAll(long bookerId, RequestStatus state);
-
     List<BookingResponseDto> getAllOwnersItems(RequestStatus requestBookingStatus, long ownerId);
 
     List<BookingResponseDto> getAllByState(RequestStatus requestBookingStatus, long userId, int from, int size);
