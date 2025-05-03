@@ -16,7 +16,7 @@ import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 @RequiredArgsConstructor
 public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
-    private final static String USER_ID = "X-Sharer-User-Id";
+    private static final String USER_ID = "X-Sharer-User-Id";
 
     @GetMapping
     public ResponseEntity<Object> getAllByOwnerId(@RequestHeader(USER_ID) long userId,
