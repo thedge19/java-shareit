@@ -16,29 +16,30 @@ import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
 @RequiredArgsConstructor
 public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
+    private final static String USER_ID = "X-Sharer-User-Id";
 
     @GetMapping
-    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader(USER_ID) long userId,
                                                   @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
                                                   @RequestParam(required = false, defaultValue = "20") @Min(1) int size) {
         return itemRequestClient.getAllByOwnerId(userId, from, size);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAll(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> getAll(@RequestHeader(USER_ID) long userId,
                                          @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
                                          @RequestParam(required = false, defaultValue = "20") @Min(1) int size) {
         return itemRequestClient.getAll(userId, from, size);
     }
 
     @GetMapping("/{itemRequestId}")
-    public ResponseEntity<Object> getById(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> getById(@RequestHeader(USER_ID) long userId,
                                           @PathVariable int itemRequestId) {
         return itemRequestClient.getById(userId, itemRequestId);
     }
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> create(@RequestHeader(USER_ID) long userId,
                                          @Valid @RequestBody ItemRequestCreateDto itemRequestCreateDto) {
 
         log.info("Контроллер");
